@@ -1,0 +1,16 @@
+---
+- hosts: localhost
+  gather_facts: no
+  vars:
+    namespace_name: grafana
+    grafana_url: https://grafana.local
+    grafana_admin_user: admin
+    grafana_admin_password: admin
+    grafana_validate_certs: no
+    grafana_docker_image: grafana/grafana
+    grafana_disk_size: 1Gi
+  environment:
+    K8S_AUTH_CONTEXT: docker-desktop
+  tasks:
+    - include_role:
+        name: grafana

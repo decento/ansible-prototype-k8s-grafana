@@ -1,0 +1,17 @@
+---
+- name: create grafana pvc
+  k8s:
+    state: present
+    definition:
+      kind: PersistentVolumeClaim
+      apiVersion: v1
+      metadata:
+        name: grafana-pvc
+        namespace: "{{ namespace_name }}"
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: "{{ grafana_disk_size }}"
+        storageClassName: hostpath

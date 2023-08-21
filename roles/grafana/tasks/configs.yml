@@ -1,0 +1,35 @@
+---
+- name: create grafana configmap
+  k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: grafana-config
+        namespace: "{{ namespace_name }}"
+      data:
+        "grafana.ini": |
+          [analytics]
+          check_for_updates = false
+          [grafana_net]
+          url = https://grafana.net
+          [log]
+          mode = console
+          [paths]
+          data = /var/lib/grafana/data
+          logs = /var/log/grafana
+          plugins = /var/lib/grafana/plugins
+
+- name: create grafana secrets
+  k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: grafana-environment
+        namespace: "{{ namespace_name }}"
+      stringData:
+        GF_SECURITY_ADMIN_USER: "{{ grafana_admin_user }}"
+        GF_SECURITY_ADMIN_PASSWORD: "{{ grafana_admin_password }}"

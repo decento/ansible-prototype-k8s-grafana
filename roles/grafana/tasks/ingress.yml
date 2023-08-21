@@ -1,0 +1,45 @@
+---
+- name: create grafana service
+  k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: grafana-service
+        namespace: "{{ namespace_name }}"
+      spec:
+        selector:
+          app: grafana
+        ports:
+          - port: 80
+            targetPort: 3000
+            protocol: TCP
+
+
+- name: create grafana ingress
+  k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Ingress
+      metadata:
+        name: grafana-ingress
+        namespace: "{{ namespace_name }}"
+      spec:
+        ingressClassName: nginx
+        rules:
+          - host: "{{ grafana_url | regex_replace('https://') }}"
+            http:
+              paths:
+              - path: "/"
+                pathType: ImplementationSpecific
+                backend:
+                  service:
+                    name: grafana-service
+                    port:
+                      number: 80
+        tls:
+          - hosts:
+              - "{{ grafana_url | regex_replace('https://') }}"
+

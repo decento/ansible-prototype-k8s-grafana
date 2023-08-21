@@ -1,0 +1,16 @@
+---
+# tasks file for k8s deployment
+
+- name: Create grafana namespace
+  k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ namespace_name }}"
+
+- include: pvc.yml
+- include: configs.yml
+- include: ingress.yml
+- include: deployment.yml

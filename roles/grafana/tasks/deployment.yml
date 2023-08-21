@@ -1,0 +1,80 @@
+---
+
+- name: create grafana deployment
+  k8s:
+    state: present
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        labels:
+          app: grafana
+        name: grafana
+        namespace: grafana
+      spec:
+        replicas: 1
+        selector:
+          matchLabels:
+            app: grafana
+        strategy:
+          type: Recreate
+        template:
+          metadata:
+            labels:
+              app: grafana
+          spec:
+            containers:
+            - name: grafana
+              envFrom:
+                - secretRef:
+                    name: grafana-environment
+              ports:
+                - containerPort: 3000
+              image: "{{ grafana_docker_image }}"
+              imagePullPolicy: Always
+              volumeMounts:
+              - mountPath: /etc/grafana/grafana.ini
+                mountPropagation: None
+                name: config
+                subPath: grafana.ini
+              - mountPath: /var/lib/grafana
+                mountPropagation: None
+                name: vol-grafana-storage
+              livenessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /api/health
+                  port: 3000
+                  scheme: HTTP
+                initialDelaySeconds: 60
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 30
+              readinessProbe:
+                failureThreshold: 3
+                httpGet:
+                  path: /api/health
+                  port: 3000
+                  scheme: HTTP
+                periodSeconds: 10
+                successThreshold: 1
+                timeoutSeconds: 1
+            initContainers:
+            - command:
+              - sh
+              - -c
+              - chown -R 472:472 /var/lib/grafana
+              image: busybox:1.30
+              imagePullPolicy: IfNotPresent
+              name: grafana-fix-vol-permissions
+              volumeMounts:
+              - mountPath: /var/lib/grafana
+                mountPropagation: None
+                name: vol-grafana-storage
+            volumes:
+            - configMap:
+                name: grafana-config
+              name: config
+            - name: vol-grafana-storage
+              persistentVolumeClaim:
+                claimName: grafana-pvc
