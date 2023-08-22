@@ -3,7 +3,7 @@
 
 - name: Create grafana namespace
   k8s:
-    state: present
+    state: "{{ state }}"
     definition:
       apiVersion: v1
       kind: Namespace

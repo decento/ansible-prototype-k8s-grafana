@@ -1,7 +1,7 @@
 ---
 - name: create grafana configmap
   k8s:
-    state: present
+    state: "{{ state }}"
     definition:
       apiVersion: v1
       kind: ConfigMap
@@ -23,7 +23,7 @@
 
 - name: create grafana secrets
   k8s:
-    state: present
+    state: "{{ state }}"
     definition:
       apiVersion: v1
       kind: Secret

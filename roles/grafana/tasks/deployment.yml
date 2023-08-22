@@ -2,7 +2,7 @@
 
 - name: create grafana deployment
   k8s:
-    state: present
+    state: "{{ state }}"
     definition:
       apiVersion: apps/v1
       kind: Deployment

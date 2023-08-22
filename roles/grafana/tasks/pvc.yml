@@ -1,7 +1,7 @@
 ---
 - name: create grafana pvc
   k8s:
-    state: present
+    state: "{{ state }}"
     definition:
       kind: PersistentVolumeClaim
       apiVersion: v1

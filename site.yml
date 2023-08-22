@@ -1,6 +1,11 @@
 ---
 - hosts: localhost
   gather_facts: no
+  vars_prompt:
+    - name: state
+      prompt: Choose state (present/absent)
+      default: present
+      private: false
   vars:
     namespace_name: grafana
     grafana_url: https://grafana.local
@@ -12,5 +17,7 @@
   environment:
     K8S_AUTH_CONTEXT: docker-desktop
   tasks:
+    - assert:
+        that: (state == "present") or (state == "absent")
     - include_role:
         name: grafana
